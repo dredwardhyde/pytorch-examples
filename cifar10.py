@@ -12,7 +12,7 @@ print(device)
 transforms = transforms.Compose(
     [transforms.ToTensor(), transforms.Normalize((0.4915, 0.4823, 0.4468), (0.2470, 0.2435, 0.2616))])
 
-data_path = '../data-unversioned/p1ch7/'
+data_path = './data-cifar/'
 cifar10 = datasets.CIFAR10(data_path, train=True, download=True, transform=transforms)
 cifar10_val = datasets.CIFAR10(data_path, train=False, download=False, transform=transforms)
 label_map = {0: 0, 2: 1}
@@ -62,6 +62,7 @@ with torch.no_grad():
     correct = 0
     total = 0
     for imgs, labels in train_loader:
+        imgs, labels = imgs.to(device=device), labels.to(device=device)
         outputs = model(imgs)
         _, predicted = torch.max(outputs, dim=1)
         total += labels.shape[0]
@@ -73,6 +74,7 @@ with torch.no_grad():
     correct = 0
     total = 0
     for imgs, labels in val_loader:
+        imgs, labels = imgs.to(device=device), labels.to(device=device)
         outputs = model(imgs)
         _, predicted = torch.max(outputs, dim=1)
         total += labels.shape[0]
