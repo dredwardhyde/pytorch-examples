@@ -8,10 +8,9 @@ torch.set_printoptions(edgeitems=2)
 torch.manual_seed(123)
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-print(device)
+print("Current device: " + str(device))
 transforms = transforms.Compose(
     [transforms.ToTensor(), transforms.Normalize((0.4915, 0.4823, 0.4468), (0.2470, 0.2435, 0.2616))])
-
 data_path = './data-cifar/'
 cifar10 = datasets.CIFAR10(data_path, train=True, download=True, transform=transforms)
 cifar10_val = datasets.CIFAR10(data_path, train=False, download=False, transform=transforms)
@@ -46,7 +45,6 @@ class Net(nn.Module):
 model = Net().to(device=device)
 optimizer = optim.SGD(model.parameters(), lr=learning_rate)
 
-
 for epoch in range(n_epochs):
     for imgs, labels in train_loader:
         imgs, labels = imgs.to(device=device), labels.to(device=device)
@@ -58,25 +56,18 @@ for epoch in range(n_epochs):
     print("Epoch: %d, Loss: %f" % (epoch, float(loss)))
 
 
-with torch.no_grad():
-    correct = 0
-    total = 0
-    for imgs, labels in train_loader:
-        imgs, labels = imgs.to(device=device), labels.to(device=device)
-        outputs = model(imgs)
-        _, predicted = torch.max(outputs, dim=1)
-        total += labels.shape[0]
-        correct += int((predicted == labels).sum())
-    print("Training accuracy: %f" % (correct / total))
+def validate(loader, type):
+    with torch.no_grad():
+        correct = 0
+        total = 0
+        for imgs, labels in loader:
+            imgs, labels = imgs.to(device=device), labels.to(device=device)
+            outputs = model(imgs)
+            _, predicted = torch.max(outputs, dim=1)
+            total += labels.shape[0]
+            correct += int((predicted == labels).sum())
+        print("%s accuracy: %f" % (type, correct / total))
 
 
-with torch.no_grad():
-    correct = 0
-    total = 0
-    for imgs, labels in val_loader:
-        imgs, labels = imgs.to(device=device), labels.to(device=device)
-        outputs = model(imgs)
-        _, predicted = torch.max(outputs, dim=1)
-        total += labels.shape[0]
-        correct += int((predicted == labels).sum())
-    print("Validation accuracy: %f" % (correct / total))
+validate(train_loader, "Training")
+validate(val_loader, "Validation")
