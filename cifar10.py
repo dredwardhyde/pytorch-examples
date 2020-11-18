@@ -4,9 +4,7 @@ import torch.nn.functional as F
 import torch.optim as optim
 from torchvision import datasets, transforms
 
-torch.set_printoptions(edgeitems=2)
 torch.manual_seed(123)
-
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 print("Current device: " + str(device))
 transforms = transforms.Compose(
